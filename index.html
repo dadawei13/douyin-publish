@@ -1,53 +1,57 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>空调服务分享</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>发布到抖音</title>
     <style>
-        body { background: #f5f5f5; padding: 20px; font-family: Arial; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 12px; }
-        .image { width: 100%; border-radius: 10px; margin: 15px 0; }
-        .btn { width: 100%; padding: 16px; background: #00d778; color: white; font-size: 16px; border: none; border-radius: 10px; margin-top: 10px; }
+        body{background:#f5f5f5;padding:20px;font-family:Arial}
+        .box{background:white;padding:20px;border-radius:12px}
+        img{width:100%;border-radius:10px;margin:10px 0}
+        button{width:100%;padding:16px;background:#00be73;color:white;font-size:16px;border:none;border-radius:10px;margin-top:10px}
     </style>
 </head>
 <body>
-    <div class="card" id="content-card">加载中...</div>
+    <div class="box" id="box">加载中...</div>
 
     <script>
-        // 1. 你的抖音开放平台ClientKey
+        // ==========================================
+        // 只改这里！！！
+        // ==========================================
         const DOUYIN_CLIENT_KEY = "awjmaxwrz3moxpzg";
 
-        // 2. 内容库（图片必须是公开HTTPS链接）
-        const CONTENT_POOL = {
+        // 内容（你可以在这里加 1001、1002、1003）
+        const CONTENT = {
             "1001": {
-                title: "空调服务分享2",
-                text: "专业空调安装/维修完成，服务超棒！",
+                title: "空调服务分享3",
+                text: "专业空调安装维修服务完成！",
                 image: "https://picsum.photos/600/800"
             }
         };
 
-        const id = new URLSearchParams(window.location.search).get('id');
-        const data = CONTENT_POOL[id] || CONTENT_POOL["1001"];
+        // 读取 id
+        const id = new URLSearchParams(location.search).get("id") || "1001";
+        const data = CONTENT[id];
 
-        document.getElementById('content-card').innerHTML = `
+        // 显示页面
+        document.getElementById("box").innerHTML = `
             <h3>${data.title}</h3>
-            <img class="image" src="${data.image}">
+            <img src="${data.image}">
             <p>${data.text}</p>
-            <button class="btn" onclick="go()">📱 一键发布到抖音日常</button>
+            <button onclick="go()">立即发布到抖音</button>
         `;
 
-        // 关键：用aweme.forward的scheme唤起，不用JSBridge审核
+        // ==========================================
+        // 核心：能用的跳转格式（不用域名审核）
+        // ==========================================
         function go() {
-            const encodedText = encodeURIComponent(data.text);
-            const encodedImage = encodeURIComponent(data.image);
-            const schemeUrl = `douyin://aweme.forward?client_key=${DOUYIN_CLIENT_KEY}&content_type=image&image_list=${encodedImage}&text=${encodedText}`;
-            
-            window.location.href = schemeUrl;
+            const text = encodeURIComponent(data.text);
+            const img = encodeURIComponent(data.image);
 
-            setTimeout(() => {
-                alert("若未唤起抖音，请检查：1. 已安装抖音APP 2. ClientKey正确 3. 图片链接可公开访问");
-            }, 1500);
+            // 👇 这是唯一能跳的格式
+            const url = `https://www.douyin.com/share-platform/share?client_key=${DOUYIN_CLIENT_KEY}&content_type=image&image_list=${img}&text=${text}`;
+
+            location.href = url;
         }
     </script>
 </body>
