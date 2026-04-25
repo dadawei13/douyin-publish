@@ -1,58 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
-    <title>发布到抖音</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一键发布到抖音日常</title>
     <style>
-        body{background:#f5f5f5;padding:20px;font-family:Arial}
-        .box{background:white;padding:20px;border-radius:12px}
-        img{width:100%;border-radius:10px;margin:10px 0}
-        button{width:100%;padding:16px;background:#00be73;color:white;font-size:16px;border:none;border-radius:10px;margin-top:10px}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: #f5f5f5; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .btn { width: 100%; padding: 15px; background: #25d366; color: white; font-size: 18px; border: none; border-radius: 10px; margin-top: 20px; }
+        .image { width: 100%; border-radius: 10px; margin: 15px 0; }
+        .loading { text-align: center; padding: 30px; }
     </style>
 </head>
 <body>
-    <div class="box" id="box">加载中...</div>
+    <div class="card" id="content-card">
+        <div class="loading">加载中...</div>
+    </div>
 
     <script>
-        // ==========================================
-        // 只改这里！！！
-        // ==========================================
-        const DOUYIN_CLIENT_KEY = "awjmaxwrz3moxpzg";
-
-        // 内容（你可以在这里加 1001、1002、1003）
-        const CONTENT = {
-            "1001": {
-                title: "空调服务分享3",
-                text: "专业空调安装维修服务完成！",
-                image: "https://picsum.photos/600/800"
-            }
+        // --------------------------
+        // 【你只需要改这里3个地方】
+        // --------------------------
+        const CONFIG = {
+            // 1. 你的抖音开放平台ClientKey
+            CLIENT_KEY: "awjmaxwrz3moxpzg",
+            // 2. 你的飞书多维表格公开链接
+            FEISHU_TABLE_URL: "https://wcng0ilrl1uq.feishu.cn/base/CmwSbMB1rathD1srO7zch2cDnff?from=from_copylink",
+            // 3. 默认图片（不用改也行）
+            DEFAULT_IMAGE: "https://picsum.photos/600/800"
         };
 
-        // 读取 id
-        const id = new URLSearchParams(location.search).get("id") || "1001";
-        const data = CONTENT[id];
-
-        // 显示页面
-        document.getElementById("box").innerHTML = `
-            <h3>${data.title}</h3>
-            <img src="${data.image}">
-            <p>${data.text}</p>
-            <button onclick="go()">立即发布到抖音</button>
-        `;
-
-        // ==========================================
-        // 核心：能用的跳转格式（不用域名审核）
-        // ==========================================
-        function go() {
-            const text = encodeURIComponent(data.text);
-            const img = encodeURIComponent(data.image);
-
-            // 👇 这是唯一能跳的格式
-            const url = `https://www.douyin.com/share-platform/share?client_key=${DOUYIN_CLIENT_KEY}&content_type=image&image_list=${img}&text=${text}`;
-
-            location.href = url;
+        // 1. 获取二维码里的内容ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const contentId = urlParams.get('id');
+        if (!contentId) {
+            document.getElementById('content-card').innerHTML = `
+                <h3>无效二维码</h3>
+                <p style="margin-top:10px">请扫描正确的发布二维码</p>
+            `;
         }
+
+        // 2. 加载内容（这里先做个示例，你飞书表格搭好后再替换）
+        function loadContent() {
+            const mockData = {
+                id: contentId || "1001",
+                title: "第一个抖音完成分享",
+                text: "今天完成了完成了h5，一键分享到抖音日常~",
+                image: CONFIG.DEFAULT_IMAGE
+            };
+
+            document.getElementById('content-card').innerHTML = `
+                <h3>${mockData.title}</h3>
+                <img class="image" src="${mockData.image}" alt="内容图片">
+                <p>${mockData.text}</p>
+                <button class="btn" onclick="goPublish()">📱 一键发布到抖音日常</button>
+            `;
+        }
+
+        // 3. 唤起抖音发布
+        function goPublish() {
+            const text = document.querySelector('p').innerText;
+            const image = document.querySelector('.image').src;
+
+            // 抖音唤起链接
+            const douyinScheme = `snssdk1128://aweme_forward?client_key=${CONFIG.CLIENT_KEY}&content_type=image&image_list=${encodeURIComponent(image)}&text=${encodeURIComponent(text)}`;
+            
+            // 跳转到抖音
+            window.location.href = douyinScheme;
+
+            // 备用提示
+            setTimeout(() => {
+                alert("请确保手机已安装抖音APP，或使用手机浏览器打开");
+            }, 1000);
+        }
+
+        // 启动
+        loadContent();
     </script>
 </body>
 </html>
