@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一键发布到抖音日常</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: #f5f5f5; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .btn { width: 100%; padding: 15px; background: #25d366; color: white; font-size: 18px; border: none; border-radius: 10px; margin-top: 20px; }
+        .image { width: 100%; border-radius: 10px; margin: 15px 0; }
+        .loading { text-align: center; padding: 30px; }
+    </style>
+</head>
+<body>
+    <div class="card" id="content-card">
+        <div class="loading">加载中...</div>
+    </div>
+
+    <script>
+        // --------------------------
+        // 【你只需要改这里3个地方】
+        // --------------------------
+        const CONFIG = {
+            // 1. 你的抖音开放平台ClientKey
+            CLIENT_KEY: "awjmaxwrz3moxpzg",
+            // 2. 你的飞书多维表格公开链接
+            FEISHU_TABLE_URL: "https://wcng0ilrl1uq.feishu.cn/base/CmwSbMB1rathD1srO7zch2cDnff?table=tblifFBSHw7gmeJn&view=vewcaXOZCF",
+            // 3. 默认图片（不用改也行）
+            DEFAULT_IMAGE: "https://picsum.photos/600/800"
+        };
+
+        // 1. 获取二维码里的内容ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const contentId = urlParams.get('id');
+        if (!contentId) {
+            document.getElementById('content-card').innerHTML = `
+                <h3>无效二维码</h3>
+                <p style="margin-top:10px">请扫描正确的发布二维码</p>
+            `;
+        }
+
+        // 2. 加载内容（这里先做个示例，你飞书表格搭好后再替换）
+        function loadContent() {
+            const mockData = {
+                id: contentId || "1001",
+                title: "空调服务完成分享",
+                text: "今天完成了空调安装/维修，一键分享到抖音日常~",
+                image: CONFIG.DEFAULT_IMAGE
+            };
+
+            document.getElementById('content-card').innerHTML = `
+                <h3>${mockData.title}</h3>
+                <img class="image" src="${mockData.image}" alt="内容图片">
+                <p>${mockData.text}</p>
+                <button class="btn" onclick="goPublish()">📱 一键发布到抖音日常</button>
+            `;
+        }
+
+        // 3. 唤起抖音发布
+        function goPublish() {
+            const text = document.querySelector('p').innerText;
+            const image = document.querySelector('.image').src;
+
+            // 抖音唤起链接
+            const douyinScheme = `snssdk1128://aweme_forward?client_key=${CONFIG.CLIENT_KEY}&content_type=image&image_list=${encodeURIComponent(image)}&text=${encodeURIComponent(text)}`;
+            
+            // 跳转到抖音
+            window.location.href = douyinScheme;
+
+            // 备用提示
+            setTimeout(() => {
+                alert("请确保手机已安装抖音APP，或使用手机浏览器打开");
+            }, 1000);
+        }
+
+        // 启动
+        loadContent();
+    </script>
+</body>
+</html>
